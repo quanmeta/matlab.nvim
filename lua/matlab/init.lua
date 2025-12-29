@@ -26,6 +26,38 @@ M.setup = function(user_opts)
     return _config
 end
 
+
+M.is_function_file = function(buf)
+  buf = buf or vim.api.nvim_get_current_buf()
+
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+
+  for _, line in ipairs(lines) do
+    -- 去掉前后空白
+    local l = vim.trim(line)
+
+    -- 跳过空行
+    if l ~= "" then
+      -- 跳过注释
+      if l:match("^%%") then
+        goto continue
+      end
+
+      -- 第一个有效行是否是 function
+      if l:match("^function%s+") then
+        return true
+      else
+        return false
+      end
+    end
+
+    ::continue::
+  end
+
+  return false
+end
+
+
 M._matlab_open_buffer = function()
     -- Get the current buffer number
     local current_buffer = vim.fn.bufnr('%')
